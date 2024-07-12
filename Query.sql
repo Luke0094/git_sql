@@ -59,3 +59,40 @@ CREATE TABLE impiegato(id_impiegato INT(255),
 									livello INT(100),
 									sesso ENUM('m','f'));
 
+
+RENAME table impiegato to impiegati;
+
+ALTER TABLE impiegati DROP column stipendio_in_lire,
+								ADD cognome VARCHAR(100),
+								MODIFY COLUMN livello VARCHAR(10),
+								CHANGE COLUMN stiendio_in_euro stipendio;
+								
+-- CONSTRAINT -> sono dei vincoli sui valori che io posso insenrire nelle colonne
+-- NOT NULL -> obbliga a inserire qualcosa nella colonna, la colonna onon può essere NULL
+
+CREATE TABLE tizio (id INT NOT NULL,
+							nome VARCHAR(100) NOT NULL,
+							cognome VARCHAR(100),
+							email VARCHAR(100));
+
+-- rendo la colonna NOT NULL successivamente alla creazione
+ALTER table tizio MODIFY cognome VARCHAR(100) NOT NULL;
+
+-- unique -> rende i valori tutti diversi / non ammetet dupplicati
+ALTER TABLE tizio ADD constraint email_uq UNIQUE (email);
+
+ALTER TABLE tizio ADD COLUMN telefono VARCHAR(100),
+										ADD CONSTRAINT telefono_uq UNIQUE(telefono);
+										
+ALTER TABLE tizio DROP CONSTRAINT telefono_uq;
+
+ALTER table tizio MODIFY cognome VARCHAR(100) NULL;
+
+ALTER TABLE tizio ADD COLUMN ETA INT;
+
+-- check -> obbliga ad inserire solo alcuni valori
+ALTER TABLE tizio ADD CONSTRAINT eta_ck CHECK(eta>18);
+
+ALTER table tizio ADD constraint nome_ck CHECK(length(nome)>3);
+
+CREATE TABLE tizio2(Id INT, email VARCHAR(50) NOT NULL UNIQUE CHECK(email LIKE '%@%'));
