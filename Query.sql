@@ -50,7 +50,7 @@ CREATE TABLE utente(id INT,
 							sesso ENUM('m','f','x'),
 							patentato ENUM('s','no'));
 							
-CREATE TABLE impiegato(id_impiegato INT,				
+CREATE TABLE impiegato(id_impiegato INT(255),				
 									nome VARCHAR(50),
 									data_asssunzione DATETIME,
 									stipendio_in_lire INT(255),
