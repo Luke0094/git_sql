@@ -1073,4 +1073,167 @@ AND sal>=
 	FROM emp
 	WHERE deptno=10)
 	
--- qual'è l'ordine che costinie il prodotto che costa di meno
+-- qual'è l'ordine che contiene il prodotto che costa di meno
+
+SELECT * FROM orderitems
+whwere prod_id IN(
+SELECT prod_id FROM producta WHERE prod_price=(SELECT MIN(prod_price) FROM products)
+);
+
+SELECT * FROM orderitems WHERE item_price=(SELECT MIN(prod_price) FROM products )
+
+-- -----------------------
+-- le subquery devono ritornare un valore solo
+-- nel caso dell'uguale si cambia con  in
+-- nel caso dei > o < si usa >any o <any 
+SELECT * FROM emp
+WHERE sal IN (SELECT MIN(sal)
+			FROM emp
+			GROUP BY deptno
+)
+
+SELECT * FROM emp
+WHERE sal > all (SELECT MIN(sal)
+						FROM emp
+						GROUP BY deptno
+)
+
+-- gli impiegati del dipeartimento 10 che guadagnano almeno quanto qualsiasi dipendente del dipartimento 30
+
+
+SELECT * FROM emp
+WHERE deptno=10
+and sal>=ANY(SELECT sal FROM emp WHERE deptno=30);
+
+-- visualizza il nome degli impiegati che lavorano in un dipartimento nel quale dipartimento
+-- c'è un impiegato che ha il nome che contiene la lettera 't'
+
+SELECT * FROM emp
+WHERE ename like '%t%'
+;
+
+SELECT * FROM emp
+WHERE deptno IN (SELECT deptno FROM emp WHERE ename LIKE '%t%');
+
+-- elencare tutti gli impiegati che non lavorano del dipartimento 30
+-- ma che guadagnano più di ciauscun impiegato che lavora nel dipartimento 30
+
+SELECT * FROM emp
+WHERE deptno != 30 
+AND sal > ANY (SELECT sal FROM emp WHERE deptno = 30);
+
+
+SELECT ename, city
+FROM emp e ,dept d
+WHERE e.deptno=d.DEPTNO; -- condizione di join
+-- prodotto cartesiano moltiplicazione di una riga della tabella X, tutte le altre da evite assolutamente
+
+
+-- SQL standart iso qualcosa
+SELECT ename, city
+FROM emp e JOIN dept d-- la virgola viene sostituita dalla parola join
+ON e.deptno=d.DEPTNO; -- la WHERE con la parola on
+
+SELECT *
+from emp e, dept d
+WHERE e.DEPTNO=d.DEPTNO -- condizione di join
+AND sal>5000;
+
+SELECT *
+FROM emp e JOIN dept d
+ON e.DEPTNO=d.DEPTNO -- condizione di join
+WHERE sal>5000;
+
+SELECT *
+FROM  customers c, orders d
+WHERE c.cust_id=0.cust_id;
+
+SELECT *
+FROM vendors v JOIN products p
+ON v.vend_id=p.vend_id;
+
+-- quali sono gli ordini fatti dal cliente che ha la mail sales@villagetoys.com ?
+SELECT * FROM orders WHERE cust_id=(SELECT cust_id FROM customers WHERE cust_email='sales@villagetoys.com');
+
+SELECT *
+FROM orders o, customers c
+WHERE o.cust_id=c.cust_id
+AND cust_email='sales@villagetoys.com';
+
+-- chi è il venditore che ha venduto i prodotti al cliente con la mail sales@villagetoys.com ?
+
+SELECT *
+from customers c,orders o, orderitems oi, products p, vendors v
+ WHERE c.cust_id=o.cust_id
+ AND o.order_num=oi.ORDER_NUM
+ AND oi.PROD_ID=p.prod_id
+ AND p.vend_id=v.vend_id
+ AND cust_email='sales@villagetoys.com';
+ 
+ SELECT *
+ FROM customers c JOIN orders o
+ ON c.cust_id=o.cust_id
+ JOIN orderitems oi
+ ON o.order_num=oi.ORDER_NUM
+ JOIN products p
+ ON oi.PROD_ID=p.prod_id
+ JOIN vendors v
+ ON p.vend_id=v.vend_id
+ WHERE cust_email='sales@villagetoys.com';
+ 
+-- SELF JOIN
+SELECT i.ENAME AS impiegato, 'lavora per', m.ENAME AS manager
+FROM emp i, emp m
+WHERE i.MGR=m.EMPNO;
+
+-- in che città lavorano i dipendenti che fann i clerk
+-- visuaizzare nome e città
+
+SELECT *
+FROM emp a, dept b
+WHERE a.DEPTNO=b.DEPTNO
+AND job = 'clerk';
+
+-- chi è il cliente che ha ordinato il prodotto 'RGAN01'
+
+SELECT *
+FROM customers c, orders o, orderitems oi
+WHERE c.cust_id=o.cust_id
+AND o.order_num=oi.ORDER_NUM
+AND oi.PROD_ID='RGAN01';
+
+-- Visualizzare il nome del dipartimento dove ci sono almeno 6 lavoratori
+
+SELECT d.DNAME, COUNT(*)
+FROM dept d JOIN emp e
+ON e.DEPTNO=d.DEPTNO
+GROUP BY d.DNAME
+HAVING COUNT(*)>=6;
+
+-- trovare le persone che fanno lo stesso lavoro di chi di quelli che lavorano a londra
+SELECT * FROM emp WHERE job IN
+(SELECT job FROM emp e, dept d
+WHERE e.DEPTNO=d.DEPTNO
+AND city='London');
+
+SELECT *
+FROM emp e, dept d
+WHERE e.DEPTNO=d.DEPTNO
+
+SELECT * FROM emp e RIGHT OUTER JOIN dept d
+ON e.DEPTNO=d.DEPTNO
+
+SELECT * FROM dept d left OUTER JOIN emp e
+ON d.DEPTNO=e.DEPTNO
+WHERE empno IS NULL;
+
+SELECT * FROM vendors v LEFT OUTER JOIN  products p
+ON v.vend_id=p.vend_id
+WHERE p.prod_id IS NULL;
+
+SELECT * FROM customers c LEFT OUTER JOIN orders o
+ON c.cust_id=o.cust_id
+WHERE o.order_num IS NULL
+
+-- Quali prodotti sono stati venduti il 1 maggio e da chi?
+-- chi sono gli impiegati che guadagano più della media del LORO STESSO	 dipartimento per ogni dipartimento
