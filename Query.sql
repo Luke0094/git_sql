@@ -1233,7 +1233,167 @@ WHERE p.prod_id IS NULL;
 
 SELECT * FROM customers c LEFT OUTER JOIN orders o
 ON c.cust_id=o.cust_id
-WHERE o.order_num IS NULL
+WHERE o.order_num IS NULL;
 
 -- Quali prodotti sono stati venduti il 1 maggio e da chi?
 -- chi sono gli impiegati che guadagano più della media del LORO STESSO	 dipartimento per ogni dipartimento
+
+SELECT p.prod_name,p.prod_price,o.order_num,o.order_date,c.cust_name,v.vend_name
+FROM orders o, customers c, vendors v, products p, orderitems oi
+WHERE order_date = "2004-05-01"
+AND o.cust_id=c.cust_id
+AND o.order_num=oi.ORDER_NUM
+AND oi.PROD_ID=p.prod_id
+AND oi.PROD_ID=p.prod_id
+AND p.vend_id=v.vend_id;
+
+
+SELECT ename, job, city
+FROM emp e, dept d
+WHERE e.DEPTNO=d.DEPTNO;
+
+
+SELECT ename, job, city, d.DEPTNO
+FROM emp e RIGHT OUTER JOIN dept d
+ON e.DEPTNO=d.DEPTNO
+WHERE e.DEPTNO;
+
+
+SELECT e.deptno, e,ename, e.sal
+FROM emp
+WHERE sal > (SELECT avg(sal) FROM emp
+WHERE e.deptno = e.deptno
+GROUP BY depno;
+
+
+SELECT * FROM emp e
+WHERE sal>(
+				SELECT AVG(sal)
+				FROM emp m
+				WHERE e.DEPTNO=m.DEPTNO
+				GROUP BY deptno;
+				
+
+SELECT *
+FROM emp e RIGHT OUTER JOIN dept d
+ON e.DEPTNO=d.DEPTNO
+WHERE empno IS NULL;
+
+-- tira fuori le righe quando la condizione di JOIN è falsa
+SELECT * FROM dept d
+WHERE NOT EXISTS( -- subquery correlata
+	SELECT * FROM emp e
+	WHERE e.DEPTNO=d.DEPTNO -- JOIN con una query esterna
+);
+	
+	-- equivale a fare una join normale
+SELECT * FROM dept d
+WHERE EXISTS(-- subquery correlata
+	SELECT * FROM emp e
+	WHERE e.DEPTNO=d.DEPTNO -- JOIN con una query esterna
+);
+
+SELECT * FROM vendors v
+WHERE NOT EXISTS(
+	SELECT * FROM products p
+	WHERE p.vend_id=v.vend_id
+);
+
+
+SELECT *
+FROM vendors v LEFT OUTER JOIN products p
+ON v.vend_id=p.vend_id
+WHERE p.vend_id IS NULL;
+
+
+SELECT * FROM customers c
+WHERE NOT EXISTS(
+
+	SELECT * FROM orders o
+	WHERE c.cust_id=o.cust_id
+	);
+	
+SELECT * FROM customers c LEFT OUTER JOIN orders o
+ON c.cust_id=o.cust_id
+WHERE o.cust_id IS NULL;
+
+-- CTE common table expression
+WITH q AS 
+(SELECT deptno, SUM(sal)
+FROM emp
+GROUP BY deptno)
+SELECT * FROM q
+WHERE deptno = 30;
+
+-- tabelle virtuali
+WITH 
+g AS 
+(SELECT deptno, SUM(sal) AS sommaSal
+FROM emp
+GROUP BY deptno)
+SELECT * 
+FROM g, dept d
+WHERE g.deptno=d.DEPTNO;
+
+WITH 
+s1 AS
+(SELECT deptno, SUM(sal) AS sommaSal
+FROM emp
+GROUP BY deptno),
+s2 AS (SELECT * FROM dept)
+SELECT s1.sommaSal, s2.dname
+FROM s1,s2
+WHERE s1.deptno = s2.deptno;
+
+
+
+SELECT * FROM emp
+WHERE sal>
+		(SELECT AVG(sal) as media
+		FROM emp x
+		WHERE e.deptno=x.DEPTNO
+		GROUP BY x.deptno);
+	
+
+		
+WITH x AS
+(SELECT deptno, AVG(sal) AS media
+FROM emp x
+GROUP BY x.DEPTNO)
+
+SELECT * FROM emp e,X
+WHERE e.DEPTNO=x.DEPTNO
+AND e.sal>x.media;
+
+
+
+-- UNION
+--ci devono essere lo stesso numiero di colonne , e preferibilmente dello stesso tipo
+
+SELECT deptno, dname, FROM dept
+UNION
+SELECT deptno, ename FROM emp;
+
+
+
+-- la union filtra i duplicati 
+-- la union all mostra anche i duplicati
+SELECT deptno AS 'numero dipartimento', COUNT(*) AS 'numero impiegati' FROM emp GROUP BY deptno
+UNION all
+SELECT 'impiegati totali', COUNT(*) FROM emp;
+
+SELECT deptno FROM dept
+UNION all
+SELECT deptno FROM emp;
+
+
+-- trovare gli impiegati che sono stati assunti dopo il 20-07-1998
+-- e il loro manager 
+
+WITH x AS
+(SELECT ename, hire_date
+FROM emp x
+GROUP BY x.hire_date
+WHERE hire_date > "20-07-1998"
+
+
