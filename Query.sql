@@ -1394,6 +1394,6 @@ WITH x AS
 (SELECT ename, hire_date
 FROM emp x
 GROUP BY x.hire_date
-WHERE hire_date > "20-07-1998"
+WHERE hire_date > "20-07-1998");
 
 
